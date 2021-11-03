@@ -67,20 +67,20 @@ function init() {
   // 3Dモデル(GLTF形式)の読み込み
   //cameraUpdate();
   //update();
-  const SCALE 0.01
+  const SCALE = 0.01;
   const loader = new THREE.GLTFLoader();
-  let car;
+  let cars = [];
   loader.load("glTF/scene.gltf", model => {
     model.scene.traverse(obj => {
       if (obj.name == "SHTV_Prefab_Car_Ambilance") {
         obj.position.set(0, 0, 0);
         obj.scale.set(SCALE, SCALE, SCALE);
         obj.rotation.y = 0;
-        car = obj;
+        cars.push(obj);
       }
     });
     console.log(model);
-    scene.add(car);
+    scene.add(cars[0]);
     update();
   });
 

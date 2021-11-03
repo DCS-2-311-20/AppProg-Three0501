@@ -71,20 +71,22 @@ function init() {
   const PREFIX = "SHTV_Prefab_Car_"
   const loader = new THREE.GLTFLoader();
   let cars = [];
+  let carNames = [];
   loader.load("glTF/scene.gltf", model => {
     console.log(model);
     model.scene.traverse(obj => {
       if (obj.name.indexOf(PREFIX) == 0) {
-        //const name = obj.name.substring(PREFIX.length);
+        const name = obj.name.substring(PREFIX.length);
+        carNames.push(name);
         obj.position.set(0, 0, 0);
         obj.scale.set(SCALE, SCALE, SCALE);
         obj.rotation.y = 0;
         console.log(obj.name);
-        //cars[name]=obj;
-        cars.push(obj);
+        cars[name]=obj;
+        //cars.push(obj);
       }
     });
-    scene.add(cars[0]);
+    scene.add(cars[carNames[0]]);
     update();
   });
 

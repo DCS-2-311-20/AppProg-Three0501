@@ -6,6 +6,21 @@
 		</title>
 		<style>
 		  body { margin: 0; }
+			#info {
+				position: absolute;
+				bottom: 10px;
+				width: 100%;
+				text-align: center;
+				color: white;
+				z-index: 100;
+				display: block;
+			}
+			a:link {
+				color: lightgreen
+			}
+			a:visited {
+				color: lightblue
+			}
 		</style>
 	</head>
 	<body>
@@ -17,5 +32,11 @@
 
     <script src="https://unpkg.com/dat.gui/build/dat.gui.min.js"></script>
 		<script src="three0501.js"></script>
+		<div id=info>This work is based on
+			<a href="https://sketchfab.com/3d-models/4-low-poly-toon-city-cars-cdce7c9c2a17473cadd03ce4746b4f13">"
+				4 Low Poly Toon City Cars" </a>
+				 by <a href="https://sketchfab.com/tselikov.viktor">Viktor Tselikov </a>
+					 licensed under  <a href="http://creativecommons.org/licenses/by/4.0/">CC-BY-4.0</a>
+		</div>
 	</body>
 </html>

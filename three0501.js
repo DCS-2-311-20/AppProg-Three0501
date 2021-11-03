@@ -10,7 +10,7 @@ function init() {
   const controls = {
     fov: 60, // 視野角
     x: 7,
-    y: 4,
+    y: 2,
     z: 6,
   };
 
@@ -24,7 +24,7 @@ function init() {
   function cameraUpdate() {
     camera.fov = controls.fov;
     camera.position.set(controls.x, controls.y, controls.z);
-    camera.lookAt(new THREE.Vector3(0, 0, 0));
+    camera.lookAt(new THREE.Vector3(0, 0.8, 0));
     camera.updateProjectionMatrix();
   }
 
@@ -68,18 +68,22 @@ function init() {
   //cameraUpdate();
   //update();
   const SCALE = 0.01;
+  const PREFIX = "SHTV_Prefab_Car_"
   const loader = new THREE.GLTFLoader();
   let cars = [];
   loader.load("glTF/scene.gltf", model => {
+    console.log(model);
     model.scene.traverse(obj => {
-      if (obj.name == "SHTV_Prefab_Car_Ambilance") {
+      if (obj.name.indexOf(PREFIX) == 0) {
+        //const name = obj.name.substring(PREFIX.length);
         obj.position.set(0, 0, 0);
         obj.scale.set(SCALE, SCALE, SCALE);
         obj.rotation.y = 0;
+        console.log(obj.name);
+        //cars[name]=obj;
         cars.push(obj);
       }
     });
-    console.log(model);
     scene.add(cars[0]);
     update();
   });

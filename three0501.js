@@ -7,26 +7,16 @@
 // ３Ｄページ作成関数の定義
 function init() {
   // 制御変数の定義
-  const controls = {
-    fov: 60, // 視野角
-    x: 7,
-    y: 2,
-    z: 6,
-  };
+  const controls = {};
 
   // シーン作成
   const scene = new THREE.Scene();
 
   // カメラの作成
   const camera = new THREE.PerspectiveCamera(
-    controls.fov, window.innerWidth/window.innerHeight, 0.1, 1000);
-  // カメラ設定関数
-  function cameraUpdate() {
-    camera.fov = controls.fov;
-    camera.position.set(controls.x, controls.y, controls.z);
-    camera.lookAt(new THREE.Vector3(0, 0.8, 0));
-    camera.updateProjectionMatrix();
-  }
+    60, window.innerWidth/window.innerHeight, 0.1, 1000);
+  camera.position.set(7, 2, 6);
+  camera.lookAt(new THREE.Vector3(0, 0.8, 0));
 
   // レンダラの設定
   const renderer = new THREE.WebGLRenderer();
@@ -36,7 +26,9 @@ function init() {
   document.getElementById("WebGL-output")
     .appendChild(renderer.domElement);
 
-  // 建物群の作成
+  // カメラの制御を入れる
+  const cameraControls = new THREE.TrackballControls(camera,
+     document.getElementById("WebGL-output"));
 
   // 平面の作成
   /*
@@ -59,10 +51,6 @@ function init() {
 
   // GUIコントローラ
   const gui = new dat.GUI();
-  gui.add(controls, "fov", 10, 100)
-  gui.add(controls, "x", -100, 100)
-  gui.add(controls, "y", 0, 100)
-  gui.add(controls, "z", -100, 100)
 
   // 3Dモデル(GLTF形式)の読み込み
   //cameraUpdate();
@@ -72,21 +60,35 @@ function init() {
   const loader = new THREE.GLTFLoader();
   let cars = [];
   let carNames = [];
+  let lastName = "";
   loader.load("glTF/scene.gltf", model => {
     console.log(model);
-    model.scene.traverse(obj => {
+    model.scene.traverse( obj => {
       if (obj.name.indexOf(PREFIX) == 0) {
         const name = obj.name.substring(PREFIX.length);
         carNames.push(name);
         obj.position.set(0, 0, 0);
         obj.scale.set(SCALE, SCALE, SCALE);
         obj.rotation.y = 0;
-        console.log(obj.name);
+        obj.visible = false;
         cars[name]=obj;
+        if (lastName == "")
+          lastName = name;
         //cars.push(obj);
       }
     });
-    scene.add(cars[carNames[0]]);
+    carNames.map( name => {
+      scene.add(cars[name]);
+    })
+    controls["car"] = lastName;
+    gui.add(controls, "car", carNames).onChange(name => {
+      cars[lastName].visible = false;
+      cars[name].visible = true;
+      lastName=name;
+    });
+    gui.close();gui.open();
+    cars[lastName].visible = true;
+    console.log(carNames);
     update();
   });
 
@@ -95,12 +97,13 @@ function init() {
 
   // 描画更新関数の定義
   function update(time) {
-    cameraUpdate();
+    //cameraUpdate();
+    cameraControls.update();
     renderer.render(scene, camera);
     requestAnimationFrame(update);
   }
   // 描画
-  //cameraUpdate();
+  cameraUpdate();
   //requestAnimationFrame(update);
 }
 

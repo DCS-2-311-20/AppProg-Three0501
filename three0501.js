@@ -31,14 +31,15 @@ function init() {
      document.getElementById("WebGL-output"));
 
   // 平面の作成
-  /*
-  const plane = new THREE.Mesh(
-    new THREE.PlaneGeometry(100,100),
-    new THREE.MeshLambertMaterial({color: 0x404040}));
-    plane.rotation.x = -Math.PI/2;
-    plane.receiveShadow = true;
-    scene.add(plane);
-  */
+  const textureLoader = new THREE.TextureLoader();
+  const texture = textureLoader.load("png/roadmap.png");
+  const roadmap = new THREE.Mesh(
+    new THREE.PlaneGeometry(100,75),
+    new THREE.MeshLambertMaterial({map: texture}));
+    roadmap.rotation.x = -Math.PI/2;
+    roadmap.receiveShadow = true;
+    scene.add(roadmap);
+
 
   // 光源の設定
   const light = new THREE.PointLight();

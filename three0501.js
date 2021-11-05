@@ -43,8 +43,11 @@ function init() {
   // 光源の設定
   const light = new THREE.PointLight();
   light.castShadow = true;
-  light.position.set(30, 50, 20);
+  light.position.set(3, 5, 2);
   scene.add(light);
+
+  const alight = new THREE.AmbientLight();
+  scene.add(alight);
 
   const axis = new THREE.AxesHelper(10);
   scene.add(axis);

@@ -21,7 +21,7 @@ function init() {
   // レンダラの設定
   const renderer = new THREE.WebGLRenderer();
   renderer.setSize(window.innerWidth, window.innerHeight);
-  renderer.setClearColor(0x204060);
+  renderer.setClearColor(0x2040A0);
   renderer.shadowMap.enabled = true;
   document.getElementById("WebGL-output")
     .appendChild(renderer.domElement);
@@ -98,6 +98,40 @@ function init() {
 
 
   // 自動操縦コースの設定
+  let course;
+  let courseObj;
+  {
+    const controlPoints = [
+      [80, 0, 45],
+      [80, 0, 60],
+      [20, 0, 60],
+      [20, 0, 20],
+      [80, 0, 20]
+    ]
+    const p0 = new THREE.Vector3();
+    const p1 = new THREE.Vector3();
+    course = new THREE.CatmullRomCurve3(
+      controlPoints.map((p, i) => {
+        p0.set(...p);
+        p1.set(...controlPoints[(i+1)%controlPoints.length])
+        return [
+          (new THREE.Vector3()).copy(p0),
+          (new THREE.Vector3()).lerpVectors(p0, p1, 0.1),
+          (new THREE.Vector3()).lerpVectors(p0, p1, 0.9),
+        ];
+        //return (new THREE.Vector3()).set(...p);
+      }).flat(), true
+    );
+    const points = course.getPoints(250);
+    const geometry = new THREE.BufferGeometry().setFromPoints(points);
+    const material = new THREE.LineBasicMaterial({color: 0xff0000});
+    courseObj = new THREE.Line(geometry, material);
+    courseObj.visible = true;
+    material.depthTest = false;
+    courseObj.renderOder = 1;
+    courseObj.position.set(-50, 0, -37.5);
+    scene.add(courseObj);
+  }
 
   // 描画更新関数の定義
   function update(time) {
@@ -107,7 +141,7 @@ function init() {
     requestAnimationFrame(update);
   }
   // 描画
-  cameraUpdate();
+  //cameraUpdate();
   //requestAnimationFrame(update);
 }
 

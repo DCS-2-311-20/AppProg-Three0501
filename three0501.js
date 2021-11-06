@@ -93,7 +93,7 @@ function init() {
     gui.close();gui.open();
     cars[lastName].visible = true;
     console.log(carNames);
-    update();
+    requestAnimationFrame(update);
   });
 
 
@@ -116,7 +116,7 @@ function init() {
         p1.set(...controlPoints[(i+1)%controlPoints.length])
         return [
           (new THREE.Vector3()).copy(p0),
-          (new THREE.Vector3()).lerpVectors(p0, p1, 0.1),
+          (new THREE.Vector3()).lerpVectors(p0, p1, 0.2),
           (new THREE.Vector3()).lerpVectors(p0, p1, 0.9),
         ];
         //return (new THREE.Vector3()).set(...p);
@@ -134,7 +134,19 @@ function init() {
   }
 
   // 描画更新関数の定義
+  const carPosition = new THREE.Vector3();
+  const carTarget = new THREE.Vector3();
   function update(time) {
+    {
+      time *= 0.001;
+      const pathTime = time * .04;
+      course.getPointAt(pathTime % 1, carPosition);
+      carPosition.applyMatrix4(courseObj.matrixWorld);
+      cars[lastName].position.copy(carPosition);
+      course.getPointAt((pathTime + 0.01) % 1, carTarget);
+      carTarget.applyMatrix4(courseObj.matrixWorld);
+      cars[lastName].lookAt(carTarget);
+    }
     //cameraUpdate();
     cameraControls.update();
     renderer.render(scene, camera);

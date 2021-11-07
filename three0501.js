@@ -43,12 +43,30 @@ function init() {
 
 
   // 光源の設定
-  const light = new THREE.PointLight();
-  light.castShadow = true;
-  light.position.set(30, 50, 20);
-  scene.add(light);
+  {
+    const light = new THREE.DirectionalLight( 0xffffff, 1);
+    //light.intensity=1.2;
+    light.castShadow = true;
+    light.position.set(100, 80, 10);
 
-  const alight = new THREE.AmbientLight();
+    light.shadow.camera.near = .1;
+    light.shadow.camera.far = 3000;
+    light.shadow.camera.right = 100;
+    light.shadow.camera.left = -100;
+    light.shadow.camera.top = 100;
+    light.shadow.camera.bottom = -100;
+    light.shadow.mapSize.width = 1024;
+    light.shadow.mapSize.height = 1024
+
+    scene.add(light);
+  }
+  {
+      const light = new THREE.AmbientLight(0x404050);
+      scene.add(light);
+  }
+  //const dlight = new THREE.DirectionalLight();
+  //dlight.castShadow = true;
+  //dlight.position.set(30, 50, 20);
   //scene.add(alight);
 
   const axis = new THREE.AxesHelper(10);
@@ -68,9 +86,15 @@ function init() {
   let lastName = "";
   let nCars = 0;
   loader.load("glTF/scene.gltf", model => {
-    console.log(model);
+    model.scene.traverse( obj => {
+      if (obj.isMesh) {
+        obj.castShadow = true;
+        obj.material.needsUpdate = true;
+      }
+    });
     model.scene.traverse( obj => {
       if (obj.name.indexOf(PREFIX) == 0) {
+        console.log(obj);
         const name = obj.name.substring(PREFIX.length);
         carNames.push(name);
         obj.position.set(0, 0, 0);
@@ -80,7 +104,6 @@ function init() {
         cars[name]=obj;
         if (lastName == "")
           lastName = name;
-        //cars.push(obj);
       }
     });
     carNames.map( name => {
@@ -144,7 +167,7 @@ function init() {
     courseObj.visible = true;
     material.depthTest = false;
     courseObj.renderOder = 1;
-    courseObj.position.set(-50, 0, -37.5);
+    courseObj.position.set(-100/2, 0, -75/2);
     scene.add(courseObj);
   }
 

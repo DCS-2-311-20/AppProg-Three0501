@@ -7,7 +7,8 @@
 // ３Ｄページ作成関数の定義
 function init() {
   // 制御変数の定義
-  const controls = {};
+  const controls = {
+  };
 
   // シーン作成
   const scene = new THREE.Scene();
@@ -15,7 +16,7 @@ function init() {
   // カメラの作成
   const camera = new THREE.PerspectiveCamera(
     60, window.innerWidth/window.innerHeight, 0.1, 1000);
-  camera.position.set(7, 2, 6);
+  camera.position.set(50, 20, 33);
   camera.lookAt(new THREE.Vector3(0, 0.8, 0));
 
   // レンダラの設定
@@ -44,11 +45,11 @@ function init() {
   // 光源の設定
   const light = new THREE.PointLight();
   light.castShadow = true;
-  light.position.set(3, 5, 2);
+  light.position.set(30, 50, 20);
   scene.add(light);
 
   const alight = new THREE.AmbientLight();
-  scene.add(alight);
+  //scene.add(alight);
 
   const axis = new THREE.AxesHelper(10);
   scene.add(axis);
@@ -65,6 +66,7 @@ function init() {
   let cars = [];
   let carNames = [];
   let lastName = "";
+  let nCars = 0;
   loader.load("glTF/scene.gltf", model => {
     console.log(model);
     model.scene.traverse( obj => {
@@ -86,12 +88,17 @@ function init() {
     })
     controls["car"] = lastName;
     gui.add(controls, "car", carNames).onChange(name => {
-      cars[lastName].visible = false;
-      cars[name].visible = true;
-      lastName=name;
+      //cars[lastName].visible = false;
+      //cars[name].visible = true;
+      const name2 = name + nCars;
+      cars[name2] = cars[name].clone();
+      cars[name2].visible = true;
+      scene.add(cars[name2]);
+      console.log(cars);
     });
-    gui.close();gui.open();
-    cars[lastName].visible = true;
+    gui.close();
+    gui.open();
+    cars[lastName].visible= true;
     console.log(carNames);
     requestAnimationFrame(update);
   });
@@ -104,6 +111,12 @@ function init() {
     const controlPoints = [
       [80, 0, 45],
       [80, 0, 60],
+
+    //  [40, 0, 60],
+    //  [40, 0, 40],
+    //  [80, 0, 40],
+
+    //  [80, 0, 60],
       [20, 0, 60],
       [20, 0, 20],
       [80, 0, 20]
@@ -111,12 +124,14 @@ function init() {
     const p0 = new THREE.Vector3();
     const p1 = new THREE.Vector3();
     course = new THREE.CatmullRomCurve3(
+      //controlPoints.map( p => {
+
       controlPoints.map((p, i) => {
         p0.set(...p);
         p1.set(...controlPoints[(i+1)%controlPoints.length])
         return [
           (new THREE.Vector3()).copy(p0),
-          (new THREE.Vector3()).lerpVectors(p0, p1, 0.2),
+          (new THREE.Vector3()).lerpVectors(p0, p1, 0.1),
           (new THREE.Vector3()).lerpVectors(p0, p1, 0.9),
         ];
         //return (new THREE.Vector3()).set(...p);
@@ -139,15 +154,21 @@ function init() {
   function update(time) {
     {
       time *= 0.001;
-      const pathTime = time * .04;
-      course.getPointAt(pathTime % 1, carPosition);
-      carPosition.applyMatrix4(courseObj.matrixWorld);
-      cars[lastName].position.copy(carPosition);
-      course.getPointAt((pathTime + 0.01) % 1, carTarget);
-      carTarget.applyMatrix4(courseObj.matrixWorld);
-      cars[lastName].lookAt(carTarget);
+      const pathTime = time * .05;
+      let i = 0;
+      nCars = Object.keys(cars).length;
+      for (let carName in cars) {
+        course.getPointAt((pathTime + i/nCars) % 1, carPosition);
+        carPosition.applyMatrix4(courseObj.matrixWorld);
+        cars[carName].position.copy(carPosition);
+        course.getPointAt((pathTime + i/nCars + 0.01) % 1, carTarget);
+        carTarget.applyMatrix4(courseObj.matrixWorld);
+        cars[carName].lookAt(carTarget);
+        cars[carName].visible = true;
+        i += 1;
+      }
     }
-    //cameraUpdate();
+    //camera.LookAt(cars[lastName].position);
     cameraControls.update();
     renderer.render(scene, camera);
     requestAnimationFrame(update);
